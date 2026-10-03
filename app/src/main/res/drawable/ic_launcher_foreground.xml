@@ -1,0 +1,23 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- neon play core -->
+    <path
+        android:fillColor="#22D3EE"
+        android:pathData="M42,36 L74,54 L42,72 Z" />
+
+    <!-- orbiting soul rings -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#A855F7"
+        android:strokeWidth="3.5"
+        android:pathData="M54,20 a34,34 0 1,0 0.1,0" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#F472B6"
+        android:strokeWidth="2.5"
+        android:pathData="M54,30 a24,24 0 1,1 -0.1,0" />
+</vector>
