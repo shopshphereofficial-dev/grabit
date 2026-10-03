@@ -1,0 +1,60 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android platform 34 (if missing)
+        run: |
+          if [ ! -d "$ANDROID_HOME/platforms/android-34" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" > /dev/null || true
+          fi
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Restore signing key
+        run: base64 -d keystore.b64 > app/grabit.p12
+
+      - name: Build release APK (shrunk, names kept)
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk GrabIt-v1.0.apk
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GrabIt-apk
+          path: GrabIt-v1.0.apk
+
+      - name: Publish release with APK
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v1.0 > /dev/null 2>&1; then
+            gh release upload v1.0 GrabIt-v1.0.apk --clobber
+          else
+            gh release create v1.0 GrabIt-v1.0.apk \
+              --title "GrabIt v1.0" \
+              --notes "Browser: the big download panel is gone - download is now a small floating button and the media-found chip can be dismissed with X, so the page is never covered. Added an HW/SW render toggle (top bar) and a one-tap render fix for pages that stay blank. Settings now has a Download tools section with WhatsApp status saver and Phone cleaner shortcuts."
+          fi
