@@ -34,12 +34,13 @@ android {
 
     signingConfigs {
         create("release") {
-            // Stable key (committed as base64) so every future update installs
-            // cleanly over the previous build.
+            // Stable key so every future update installs cleanly over the
+            // previous build. The key and its password live in GitHub Actions
+            // secrets (SIGNING_KEYSTORE_B64 / KEYSTORE_PASSWORD), not in the repo.
             storeFile file("grabit.p12")
-            storePassword "soulstream2026"
+            storePassword (System.getenv("KEYSTORE_PASSWORD") ?: "")
             keyAlias "soulstream"
-            keyPassword "soulstream2026"
+            keyPassword (System.getenv("KEYSTORE_PASSWORD") ?: "")
             storeType "PKCS12"
         }
     }

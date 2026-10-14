@@ -33,9 +33,13 @@ jobs:
           gradle-version: '8.7'
 
       - name: Restore signing key
-        run: base64 -d keystore.b64 > app/grabit.p12
+        env:
+          SIGNING_KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_B64 }}
+        run: printf '%s' "$SIGNING_KEYSTORE_B64" | base64 -d > app/grabit.p12
 
       - name: Build release APK (shrunk, names kept)
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: gradle assembleRelease --no-daemon --stacktrace
 
       - name: Rename APK
